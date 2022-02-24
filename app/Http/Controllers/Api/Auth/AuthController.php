@@ -32,11 +32,12 @@ class AuthController extends Controller
 
            return response()->json($data,200);
        }else {
+            $data['loginError'] = "Email or Password Incorrect";
             return response()->json([
-                'loginFailed' => 'Email or Password Incorrect'
+                'errors' => $data
             ],401);
        }
-       
+
     }
 
     public function register(Request $request){
@@ -46,13 +47,13 @@ class AuthController extends Controller
              'email' => 'required|email|unique:users',
              'password' => 'required|min:6|confirmed'
         ]);
- 
+
         if ($validate->fails()) {
             return response()->json([
                 'errors' => $validate->errors()
             ],422);
         }
- 
+
         $reqData = request()->only('name','phone','email','password');
         $reqData['password'] = Hash::make($request->password);
             $user = User::create($reqData);
@@ -61,8 +62,8 @@ class AuthController extends Controller
              $data['access_token'] = $user->createToken('userToken')->accessToken;
              $data['user'] = $user;
             return response()->json($data,200);
-        
      }
+
 
 
     public function logout(){
